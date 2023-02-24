@@ -5,6 +5,7 @@ import { Buffer } from 'buffer'
 import { URL as UrlParse } from 'url'
 import crypto from 'crypto'
 import * as torrentParser from './torrentParser.js'
+
 export const getPeers = (torrent, callback) => {
   const socket = dgram.createSocket('udp4')
   const url = 'udp://tracker.opentrackr.org:1337/announce'
@@ -33,20 +34,20 @@ export const getPeers = (torrent, callback) => {
   udpSend(socket, buildConnReq(), url)
 }
 
-function udpSend (socket, message, rawUrl, callback = () => { }) {
+function udpSend(socket, message, rawUrl, callback = () => { }) {
   const url = new UrlParse(rawUrl)
   console.log(message)
   socket.send(message, 0, message.length, url.port, url.hostname, callback)
 }
 
 // check response type
-function respType (resp) {
+function respType(resp) {
   const action = resp.readUInt32BE(0)
   if (action === 0) return 'connect'
   if (action === 1) return 'announce'
 }
 
-function buildConnReq () {
+function buildConnReq() {
   const buf = Buffer.alloc(16)
 
   buf.writeUInt32BE(0x417, 0)
@@ -58,7 +59,7 @@ function buildConnReq () {
   return buf
 }
 
-function parseConnResp (resp) {
+function parseConnResp(resp) {
   return {
     action: resp.readUInt32BE(0),
     transactionId: resp.readUInt32BE(4),
@@ -66,7 +67,7 @@ function parseConnResp (resp) {
   }
 }
 
-function buildAnnounceReq (connId, torrent, port = 6881) {
+function buildAnnounceReq(connId, torrent, port = 6881) {
   const buf = Buffer.allocUnsafe(98)
   connId.copy(buf, 0)
   buf.writeUInt32BE(1, 8)
@@ -83,7 +84,7 @@ function buildAnnounceReq (connId, torrent, port = 6881) {
   return buf
 }
 
-function parseAnnounceResp (resp) {
+function parseAnnounceResp(resp) {
   const group = (iterable, groupSize) => {
     const groups = []
     for (let i = 0; i < iterable.length; i += groupSize) {
