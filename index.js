@@ -3,18 +3,12 @@
 import fs from 'fs'
 import jschardet from 'jschardet'
 import bencode from 'bencode'
-import * as tracker from './tracker.js'
+import * as tracker from './src/tracker.js'
 import iconvlite from 'iconv-lite'
 
- async function main () {
-    const buffer = fs.readFileSync('example.torrent')
-    // const torrent = bencode.decode(buffer, null)
-    const torrent = ''
-    tracker.getPeers(torrent, peers => {
-        console.log('list of peers', peers)
-    })
-}
+import download from './src/download'
+import torrentParser from './src/torrentParser'
 
-main()
+const torrent = torrentParser.open(process.argv[2])
 
-
+download(torrent)
